@@ -6,7 +6,7 @@
 
 ## 1. Objective
 
-Simulate the core network of a small company with multiple departments that need to be logically separated but still route traffic between each other in a controlled way — the kind of segmentation any real office network needs from day one.
+Simulate the core network of a small company with multiple departments that need to be logically separated but still route traffic between each other in a controlled way — the kind of segmentatio[...]
 
 **Requirements I set for this build:**
 
@@ -19,7 +19,7 @@ Simulate the core network of a small company with multiple departments that need
 
 ## 2. Diagram
 
-![[topology.png]]
+![[topology.svg]]
 
 
 **Layout:** 1 core router (Cisco IOSv) in a star topology with 4 access switches — Sales, Engineering, HR, and Server-Room — each with end devices (VPCS) below them.
@@ -39,9 +39,9 @@ Simulate the core network of a small company with multiple departments that need
 
 ### Routing Design Decision
 
-Used **router-on-a-stick** rather than SVIs on L3 switches, since the topology uses one physical router with a single link to each switch — one physical interface per switch, subdivided into VLAN-tagged subinterfaces (`g0/X.10`, `g0/X.20`, etc.) with 802.1Q encapsulation. This is the natural fit for a single-router, switch-only topology; SVIs would be the better call if L3 switches were introduced instead.
+Used **router-on-a-stick** rather than SVIs on L3 switches, since the topology uses one physical router with a single link to each switch — one physical interface per switch, subdivided into VLA[...]
 
-**OSPF was not used.** OSPF exchanges routes _between_ routers — with a single router terminating all VLAN subinterfaces, every subnet is already directly connected on that one device, so there's nothing for a routing protocol to exchange. Adding OSPF here would have been technically unnecessary complexity, not rigor.
+**OSPF was not used.** OSPF exchanges routes _between_ routers — with a single router terminating all VLAN subinterfaces, every subnet is already directly connected on that one device, so there'[...]
 
 ### Switch Configuration (per switch)
 
@@ -67,7 +67,7 @@ interface g0/2.30
  ip access-group AC1 in
 ```
 
-Applied **inbound on HR's own subinterface (g0/2.30)** — this filters traffic right as it enters the router from HR, before routing decides where it goes, which is the correct place to enforce a "this subnet can't reach that subnet" rule.
+Applied **inbound on HR's own subinterface (g0/2.30)** — this filters traffic right as it enters the router from HR, before routing decides where it goes, which is the correct place to enforce a[...]
 
 **Verification performed:**
 
@@ -79,20 +79,20 @@ Applied **inbound on HR's own subinterface (g0/2.30)** — this filters traffic 
 
 ## 4. Problems I Hit and How I Fixed Them
 
-**ACL direction and destination mix-up.** My first draft of the ACL denied traffic from HR to Server-Room instead of HR to Sales — I had the destination subnet backwards. I also initially planned to apply the ACL outbound on HR's subinterface instead of inbound.
+**ACL direction and destination mix-up.** My first draft of the ACL denied traffic from HR to Server-Room instead of HR to Sales — I had the destination subnet backwards. I also initially planne[...]
 
-Working through it: to restrict where a subnet _can go_, the ACL needs to sit on that subnet's _own_ interface, filtering traffic _inbound_ — i.e., as it enters the router from that subnet, before any routing decision is made. Applying it outbound on the source interface doesn't catch outbound traffic _from_ HR in the way the rule intends. Fixing both the destination subnet and the direction resolved it — confirmed with ping tests and `show access-lists AC1` hit counters.
+Working through it: to restrict where a subnet _can go_, the ACL needs to sit on that subnet's _own_ interface, filtering traffic _inbound_ — i.e., as it enters the router from that subnet, befo[...]
 
-**Why this matters:** this is exactly the kind of mistake that's easy to make and easy to defend once understood — I'd rather show I caught and fixed it than pretend the first attempt was correct.
+**Why this matters:** this is exactly the kind of mistake that's easy to make and easy to defend once understood — I'd rather show I caught and fixed it than pretend the first attempt was correc[...]
 
 ---
 
 ## 5. What I'd Do Differently at Scale
 
-- **Redundancy:** This build uses a single router. In production, I'd add a second router and configure HSRP (or VRRP) across both, splitting switch uplinks between them, so a single router failure doesn't take down inter-VLAN routing for the whole office. I intentionally kept this lab to one router to keep the topology lean and the config reviewable end-to-end — but the design accounts for where redundancy would go.
-- **Routing protocol:** If this scaled to multiple sites or multiple routers, I'd introduce OSPF (single-area to start) to exchange routes between them, rather than relying on directly-connected subnets on one device.
-- **ACL scope:** The current ACL ends in a broad `permit ip any any`. At scale, I'd tighten this to explicitly permit only the traffic patterns the business actually needs, denying by default, rather than leaving an open permit at the end.
-- **L3 switches:** With more departments or more east-west traffic, I'd consider moving inter-VLAN routing onto L3 switches (SVIs) closer to the edge, rather than backhauling all inter-VLAN traffic through one central router link.
+- **Redundancy:** This build uses a single router. In production, I'd add a second router and configure HSRP (or VRRP) across both, splitting switch uplinks between them, so a single router failur[...]
+- **Routing protocol:** If this scaled to multiple sites or multiple routers, I'd introduce OSPF (single-area to start) to exchange routes between them, rather than relying on directly-connected s[...]
+- **ACL scope:** The current ACL ends in a broad `permit ip any any`. At scale, I'd tighten this to explicitly permit only the traffic patterns the business actually needs, denying by default, rat[...]
+- **L3 switches:** With more departments or more east-west traffic, I'd consider moving inter-VLAN routing onto L3 switches (SVIs) closer to the edge, rather than backhauling all inter-VLAN traffi[...]
 
 ---
 
