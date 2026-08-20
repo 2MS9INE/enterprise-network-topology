@@ -19,7 +19,7 @@ Simulate the core network of a small company with multiple departments that need
 
 ## 2. Diagram
 
-![[topology.svg]]
+![[topology.png]]
 
 
 **Layout:** 1 core router (Cisco IOSv) in a star topology with 4 access switches — Sales, Engineering, HR, and Server-Room — each with end devices (VPCS) below them.
