@@ -1,4 +1,4 @@
-# Project 1 — Enterprise Network Topology
+# Enterprise Network Topology
 
 **Tools used:** GNS3, Cisco IOSv, VPCS **Skills demonstrated:** VLAN segmentation, 802.1Q trunking, router-on-a-stick inter-VLAN routing, extended ACLs, network documentation
 
