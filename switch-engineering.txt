@@ -1,0 +1,23 @@
+! ENGINEERING Switch - Project 1: Enterprise Network Topology
+
+hostname ENGINEERING
+
+vlan 20
+ name ENGINEERING
+
+interface FastEthernet0/1
+ description EngineeringPC1
+ switchport mode access
+ switchport access vlan 20
+
+interface FastEthernet0/2
+ description EngineeringPC2
+ switchport mode access
+ switchport access vlan 20
+
+interface GigabitEthernet0/1
+ description Uplink to CentralRouter
+ switchport mode trunk
+ switchport trunk allowed vlan 20
+
+end

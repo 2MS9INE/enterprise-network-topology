@@ -1,0 +1,47 @@
+! CentralRouter - Project 1: Enterprise Network Topology
+! Router-on-a-stick inter-VLAN routing + ACL
+
+hostname CentralRouter
+
+ip access-list extended AC1
+ deny ip 10.10.30.0 0.0.0.255 10.10.10.0 0.0.0.255
+ permit ip any any
+
+interface GigabitEthernet0/0
+ no ip address
+ no shutdown
+
+interface GigabitEthernet0/0.10
+ description Link to Sales
+ encapsulation dot1Q 10
+ ip address 10.10.10.1 255.255.255.0
+
+interface GigabitEthernet0/1
+ no ip address
+ no shutdown
+
+interface GigabitEthernet0/1.20
+ description Link to Engineering
+ encapsulation dot1Q 20
+ ip address 10.10.20.1 255.255.255.0
+
+interface GigabitEthernet0/2
+ no ip address
+ no shutdown
+
+interface GigabitEthernet0/2.30
+ description Link to HR
+ encapsulation dot1Q 30
+ ip address 10.10.30.1 255.255.255.0
+ ip access-group AC1 in
+
+interface GigabitEthernet0/3
+ no ip address
+ no shutdown
+
+interface GigabitEthernet0/3.40
+ description Link to Server-Room
+ encapsulation dot1Q 40
+ ip address 10.10.40.1 255.255.255.0
+
+end

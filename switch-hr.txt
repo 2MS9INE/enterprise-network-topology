@@ -1,0 +1,23 @@
+! HR Switch - Project 1: Enterprise Network Topology
+
+hostname HR
+
+vlan 30
+ name HR
+
+interface FastEthernet0/1
+ description HR-PC1
+ switchport mode access
+ switchport access vlan 30
+
+interface FastEthernet0/2
+ description HR-PC2
+ switchport mode access
+ switchport access vlan 30
+
+interface GigabitEthernet0/1
+ description Uplink to CentralRouter
+ switchport mode trunk
+ switchport trunk allowed vlan 30
+
+end

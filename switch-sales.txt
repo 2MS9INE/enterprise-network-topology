@@ -1,0 +1,23 @@
+! SALES Switch - Project 1: Enterprise Network Topology
+
+hostname SALES
+
+vlan 10
+ name SALES
+
+interface FastEthernet0/1
+ description SalesPC1
+ switchport mode access
+ switchport access vlan 10
+
+interface FastEthernet0/2
+ description SalesPC2
+ switchport mode access
+ switchport access vlan 10
+
+interface GigabitEthernet0/1
+ description Uplink to CentralRouter
+ switchport mode trunk
+ switchport trunk allowed vlan 10
+
+end

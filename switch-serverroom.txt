@@ -1,0 +1,18 @@
+! SERVER-ROOM Switch - Project 1: Enterprise Network Topology
+
+hostname SERVER-ROOM
+
+vlan 40
+ name SERVER-ROOM
+
+interface FastEthernet0/1
+ description ServerRoomPC1
+ switchport mode access
+ switchport access vlan 40
+
+interface GigabitEthernet0/1
+ description Uplink to CentralRouter
+ switchport mode trunk
+ switchport trunk allowed vlan 40
+
+end
